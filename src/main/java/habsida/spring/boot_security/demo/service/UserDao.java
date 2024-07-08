@@ -1,11 +1,14 @@
-package habsida.spring.boot_security.demo.dao;
+package habsida.spring.boot_security.demo.service;
 
+import habsida.spring.boot_security.demo.models.Role;
 import habsida.spring.boot_security.demo.models.User;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class UserDao {
@@ -27,6 +30,13 @@ public class UserDao {
 
     @Transactional
     public void save(User user) {
+
+        Role roleUser = entityManager.createQuery("select r from Role r where r.roleName = 'ROLE_USER'", Role.class)
+                .getSingleResult();
+        Set<Role> roles = new HashSet<>();
+        roles.add(roleUser);
+
+        user.setRoles(roles);
         entityManager.persist(user);
 
 
@@ -39,6 +49,7 @@ public class UserDao {
             user.setAge(updateUser.getAge());
             user.setUsername(updateUser.getUsername());
             user.setEmail(updateUser.getEmail());
+            user.setPassword(updateUser.getPassword());
             entityManager.merge(user);
         }
 

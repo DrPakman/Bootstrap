@@ -1,7 +1,6 @@
 package habsida.spring.boot_security.demo.models;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
@@ -11,7 +10,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name="users")
@@ -35,10 +33,11 @@ public class User implements UserDetails {
     @Column(name="email")
     private String email;
 
+    @NotEmpty(message = "Password should not be empty")
     @Column(name="password")
     private String password;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable (
             name = "user_roles",
             joinColumns = @JoinColumn(name="user_id"),
@@ -111,9 +110,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
-                .collect(Collectors.toList());
+        return roles;
     }
 
     @Override

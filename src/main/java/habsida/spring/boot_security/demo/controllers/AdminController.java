@@ -1,6 +1,6 @@
 package habsida.spring.boot_security.demo.controllers;
 
-import habsida.spring.boot_security.demo.dao.UserDao;
+import habsida.spring.boot_security.demo.service.UserDao;
 import habsida.spring.boot_security.demo.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,7 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/users")
+@RequestMapping("/admin")
 public class AdminController {
 
     private final UserDao userDao;
@@ -24,7 +24,7 @@ public class AdminController {
         this.userDao = userDao;
     }
 
-    @GetMapping
+    @GetMapping("/index")
     public String index (Model model) {
         model.addAttribute("users", userDao.index());
         return "users/index";
@@ -36,7 +36,6 @@ public class AdminController {
         return "users/show";
     }
     @GetMapping("/new")
-    @PreAuthorize("hasRole('ADMIN')")
     public String newUser (Model model) {
         model.addAttribute("user", new User());
         return "users/newUser";
@@ -47,7 +46,7 @@ public class AdminController {
             return "users/newUser";
         }
         userDao.save(user);
-        return "redirect:/users";
+        return "redirect:/admin/index";
 
     }
     @GetMapping("/{id}/edit")
@@ -61,23 +60,15 @@ public class AdminController {
             return "users/editUser";
         }
         userDao.update(id, user);
-        return "redirect:/index";
+        return "redirect:/admin/index";
     }
     @DeleteMapping("/{id}")
     public String delete (@PathVariable("id") int id) {
         userDao.delete(id);
-        return "redirect:/index";
+        return "redirect:/admin/index";
     }
 
-    @GetMapping("/user")
-    public String userHome(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        model.addAttribute("username", auth.getName());
-        // добавить логику для отображения данных пользователя
-        return "users/show";
-    }
-
-    @GetMapping("/admin")
+    @GetMapping()
     public String adminHome() {
         return "users/adminPage";
     }
