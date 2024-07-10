@@ -1,15 +1,12 @@
 package habsida.spring.boot_security.demo.controllers;
 
-import habsida.spring.boot_security.demo.service.UserDao;
+import habsida.spring.boot_security.demo.service.UserService;
 import habsida.spring.boot_security.demo.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 
 import javax.validation.Valid;
@@ -18,21 +15,22 @@ import javax.validation.Valid;
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final UserDao userDao;
+    private final UserService userService;
     @Autowired
-    public AdminController(UserDao userDao) {
-        this.userDao = userDao;
+    public AdminController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/index")
     public String index (Model model) {
-        model.addAttribute("users", userDao.index());
+        model.addAttribute("users", userService.index());
         return "users/index";
     }
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model) {
-        model.addAttribute("user", userDao.show(id));
+        User user = userService.show(id);
+        model.addAttribute("user", user);
         return "users/show";
     }
     @GetMapping("/new")
@@ -45,13 +43,13 @@ public class AdminController {
         if (bindingResult.hasErrors()) {
             return "users/newUser";
         }
-        userDao.save(user);
+        userService.save(user);
         return "redirect:/admin/index";
 
     }
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) {
-        model.addAttribute("user", userDao.show(id));
+        model.addAttribute("user", userService.show(id));
         return "users/editUser";
     }
     @PatchMapping("/{id}")
@@ -59,12 +57,12 @@ public class AdminController {
         if (bindingResult.hasErrors()) {
             return "users/editUser";
         }
-        userDao.update(id, user);
+        userService.update(id, user);
         return "redirect:/admin/index";
     }
     @DeleteMapping("/{id}")
     public String delete (@PathVariable("id") int id) {
-        userDao.delete(id);
+        userService.delete(id);
         return "redirect:/admin/index";
     }
 

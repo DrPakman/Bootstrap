@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public class UserDao {
+public class UserService {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -46,8 +46,9 @@ public class UserDao {
     public void update(int id, User updateUser) {
         User user = entityManager.find(User.class, id);
         if (user != null) {
-            user.setAge(updateUser.getAge());
             user.setUsername(updateUser.getUsername());
+            user.setLastname(updateUser.getLastname());
+            user.setAge(updateUser.getAge());
             user.setEmail(updateUser.getEmail());
             user.setPassword(updateUser.getPassword());
             entityManager.merge(user);

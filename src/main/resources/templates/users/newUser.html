@@ -7,9 +7,13 @@
 <body>
 
 <form th:method="POST" th:action="@{/admin/new}" th:object="${user}">
-    <label for="username">Enter username: </label>
+    <label for="username">First name: </label>
     <input type="text" th:field="*{username}" id="username">
     <div style="color:red"  th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Name error</div>
+    <br/>
+    <label for="lastname">Last name: </label>
+    <input type="text" th:field="*{lastname}" id="lastname">
+    <div style="color:red"  th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}">Lastname error</div>
     <br/>
     <label for="age">Enter age: </label>
     <input type="text" th:field="*{age}" id="age">

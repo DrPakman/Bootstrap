@@ -6,9 +6,16 @@
 </head>
 <body>
 
-<p th:text="${user.getUsername() + ' ' + user.getAge()}">VALUE</p>
+<p th:text="${user.getUsername()}">VALUE<p/>
+<p th:text="${user.getLastname()}">VALUE</p>
+<p th:text="${user.getAge()}">VALUE</p>
 <p th:text="${user.getEmail()}">VALUE</p>
-<p th:text="${user.getId()}">VALUE</p>
+<p>Roles: <ul>
+    <li th:each="role : ${user.roles}" th:text="${role.roleName}"></li>
+</ul>
+</p>
+
+
 
 <a th:href="@{/admin/{id}/edit(id=${user.getId()})}">Edit</a>
 

@@ -1,7 +1,7 @@
 package habsida.spring.boot_security.demo.controllers;
 
 import habsida.spring.boot_security.demo.models.User;
-import habsida.spring.boot_security.demo.service.UserDao;
+import habsida.spring.boot_security.demo.service.UserService;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/user")
 public class UserController {
 
-    private final UserDao userDao;
+    private final UserService userService;
 
-    public UserController(UserDao userDao) {
-        this.userDao = userDao;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping
@@ -38,7 +38,7 @@ public class UserController {
             throw new AccessDeniedException("Access denied");
         }
 
-        model.addAttribute("user", userDao.show(id));
+        model.addAttribute("user", userService.show(id));
         return "users/show";
     }
 

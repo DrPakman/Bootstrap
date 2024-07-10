@@ -24,6 +24,9 @@ public class User implements UserDetails {
     @Column(name="username")
     private String username;
 
+    @Column(name="lastname")
+    private String lastname;
+
     @Min(value = 0, message = "Age should be greater than 0")
     @Column(name="age")
     private int age;
@@ -50,8 +53,9 @@ public class User implements UserDetails {
 
     }
 
-    public User(String username, int age, String email, String password, Collection<Role> roles) {
+    public User(String username, String lastname, int age, String email, String password, Collection<Role> roles) {
         this.username = username;
+        this.lastname = lastname;
         this.age = age;
         this.email = email;
         this.password = password;
@@ -73,6 +77,14 @@ public class User implements UserDetails {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
     }
 
     public int getAge() {
