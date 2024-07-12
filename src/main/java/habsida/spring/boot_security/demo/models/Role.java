@@ -59,4 +59,8 @@ public class Role implements GrantedAuthority {
     public int hashCode() {
         return Objects.hash(roleName);
     }
+    @Override
+    public String toString() {
+        return roleName.replaceFirst("ROLE_", "");
+    }
 }

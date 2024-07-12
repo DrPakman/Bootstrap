@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
@@ -23,7 +24,8 @@ public class AdminController {
 
     @GetMapping("/index")
     public String index (Model model) {
-        model.addAttribute("users", userService.index());
+        List<User> users = userService.index();
+        model.addAttribute("users",users);
         return "users/index";
     }
 
