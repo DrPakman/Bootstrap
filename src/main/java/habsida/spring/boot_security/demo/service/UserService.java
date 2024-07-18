@@ -2,6 +2,7 @@ package habsida.spring.boot_security.demo.service;
 
 import habsida.spring.boot_security.demo.models.Role;
 import habsida.spring.boot_security.demo.models.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
@@ -15,6 +16,11 @@ public class UserService {
 
     @PersistenceContext
     private EntityManager entityManager;
+    private final RoleService roleService;
+
+    public UserService(RoleService roleService) {
+        this.roleService = roleService;
+    }
 
     @Transactional(readOnly = true)
     public List<User> index() {
@@ -29,17 +35,16 @@ public class UserService {
     }
 
     @Transactional
-    public void save(User user) {
-
-        Role roleUser = entityManager.createQuery("select r from Role r where r.roleName = 'ROLE_USER'", Role.class)
-                .getSingleResult();
+    public void save(User user, List<String> roleNames) {
         Set<Role> roles = new HashSet<>();
-        roles.add(roleUser);
-
+        for (String roleName : roleNames) {
+            Role role = roleService.findRoleByName(roleName);
+            if (role != null) {
+                roles.add(role);
+            }
+        }
         user.setRoles(roles);
         entityManager.persist(user);
-
-
     }
 
     @Transactional

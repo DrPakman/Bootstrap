@@ -1,5 +1,6 @@
 package habsida.spring.boot_security.demo.controllers;
 
+import habsida.spring.boot_security.demo.service.RoleService;
 import habsida.spring.boot_security.demo.service.UserService;
 import habsida.spring.boot_security.demo.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,12 @@ import java.util.List;
 public class AdminController {
 
     private final UserService userService;
+    private final RoleService roleService;
+
     @Autowired
-    public AdminController(UserService userService) {
+    public AdminController(UserService userService, RoleService roleService) {
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     @GetMapping("/index")
@@ -38,16 +42,21 @@ public class AdminController {
     @GetMapping("/new")
     public String newUser (Model model) {
         model.addAttribute("user", new User());
-        return "users/newUser";
+        model.addAttribute("allRoles", roleService.findAllRoles());
+        return "users/index";
     }
     @PostMapping("/new")
-    public String create (@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
+    public String create(@ModelAttribute("user") @Valid User user,
+                         @RequestParam(value = "roles", required = false) List<String> roles,
+                         BindingResult bindingResult,
+                         Model model) {
         if (bindingResult.hasErrors()) {
-            return "users/newUser";
+            model.addAttribute("allRoles", roleService.findAllRoles());
+            return "users/index";
         }
-        userService.save(user);
-        return "redirect:/admin/index";
 
+        userService.save(user, roles != null ? roles : List.of());
+        return "redirect:/admin/new";
     }
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) {
