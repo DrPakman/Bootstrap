@@ -9,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-
 import javax.validation.Valid;
 import java.util.List;
 
@@ -27,9 +26,12 @@ public class AdminController {
     }
 
     @GetMapping("/index")
-    public String index (Model model) {
+    public String index(Model model, @RequestParam(value = "activeTab", required = false) String activeTab) {
         List<User> users = userService.index();
-        model.addAttribute("users",users);
+        model.addAttribute("users", users);
+        model.addAttribute("user", new User());
+        model.addAttribute("allRoles", roleService.findAllRoles());
+        model.addAttribute("activeTab", activeTab != null ? activeTab : "nav-home-tab");
         return "users/index";
     }
 
@@ -39,40 +41,41 @@ public class AdminController {
         model.addAttribute("user", user);
         return "users/show";
     }
+
     @GetMapping("/new")
-    public String newUser (Model model) {
+    public String newUser(Model model) {
         model.addAttribute("user", new User());
         model.addAttribute("allRoles", roleService.findAllRoles());
         return "users/index";
     }
-    @PostMapping("/new")
-    public String create(@ModelAttribute("user") @Valid User user,
-                         @RequestParam(value = "roles", required = false) List<String> roles,
-                         BindingResult bindingResult,
-                         Model model) {
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("allRoles", roleService.findAllRoles());
-            return "users/index";
-        }
 
-        userService.save(user, roles != null ? roles : List.of());
-        return "redirect:/admin/new";
+    @PostMapping("/new")
+    public String createUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult, @RequestParam List<String> roles) {
+        if (bindingResult.hasErrors()) {
+            return "redirect:/admin/index?activeTab=nav-profile-tab";
+        }
+        userService.createUserWithRoles(user, roles);
+        return "redirect:/admin/index?activeTab=nav-home-tab";
     }
+
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) {
         model.addAttribute("user", userService.show(id));
+        model.addAttribute("allRoles", roleService.findAllRoles());
         return "users/editUser";
     }
+
     @PatchMapping("/{id}")
-    public String update (@ModelAttribute("user") @Valid User user, BindingResult bindingResult, @PathVariable("id") int id) {
+    public String update(@ModelAttribute("user") @Valid User user, BindingResult bindingResult, @PathVariable("id") int id, @RequestParam List<String> roles) {
         if (bindingResult.hasErrors()) {
             return "users/editUser";
         }
-        userService.update(id, user);
+        userService.updateUserWithRoles(id, user, roles);
         return "redirect:/admin/index";
     }
+
     @DeleteMapping("/{id}")
-    public String delete (@PathVariable("id") int id) {
+    public String delete(@PathVariable("id") int id) {
         userService.delete(id);
         return "redirect:/admin/index";
     }
@@ -81,8 +84,4 @@ public class AdminController {
     public String adminHome() {
         return "users/adminPage";
     }
-
-
-
-
 }

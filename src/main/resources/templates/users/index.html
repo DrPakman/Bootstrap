@@ -139,9 +139,10 @@
             <h5>New User</h5>
             <div class="container-fluid">
                 <form th:method="POST" th:action="@{/admin/new}" th:object="${user}">
+                    <input type="hidden" name="activeTab" value="nav-home-tab" id="activeTabInput">
                     <div class="info-item">
                         <strong>First Name</strong>
-                        <input type="text" class="form-control" th:field="*{username}" required />
+                        <input type="text" class="form-control" id="username" th:field="*{username}" required />
                     </div>
                     <div class="info-item">
                         <strong>Last Name</strong>
@@ -157,21 +158,17 @@
                     </div>
                     <div class="info-item">
                         <strong>Password</strong>
-                        <input type="password" class="form-control" th:field="*{password}" required />
+                        <input type="password" id="password" th:field="*{password}" required>
                     </div>
                     <div class="info-item">
                         <strong>Role</strong>
-                        <div class="roles-container" style="max-height: 100px; overflow-y: auto;">
-                            <ul style="margin: 0; padding: 0; list-style: none;">
-                                <li th:each="role : ${allRoles}" style="text-align: left;">
-                                    <label style="display: block;">
-                                        <input type="checkbox" name="roles" th:value="${role}" style="vertical-align: middle; margin-right: 5px;" />
-                                        <span th:text="${role}"></span>
-                                    </label>
-                                </li>
-                            </ul>
+                        <div class="form-group">
+                            <label for="roles">Role:</label>
                         </div>
-                    </div>
+                            <select id="roles" name="roles" class="form-control" multiple>
+                                <option th:each="role : ${allRoles}" th:value="${role.roleName}" th:text="${role.roleName}"></option>
+                            </select>
+                        </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Create User</button>
                     </div>
