@@ -4,6 +4,8 @@ import habsida.spring.boot_security.demo.service.RoleService;
 import habsida.spring.boot_security.demo.service.UserService;
 import habsida.spring.boot_security.demo.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,11 +27,12 @@ public class AdminController {
         this.roleService = roleService;
     }
 
-    @GetMapping("/index")
-    public String index(Model model, @RequestParam(value = "activeTab", required = false) String activeTab) {
+    @GetMapping("")
+    public String index(Model model, @AuthenticationPrincipal UserDetails currentUser, @RequestParam(value = "activeTab", required = false) String activeTab) {
         List<User> users = userService.index();
         model.addAttribute("users", users);
         model.addAttribute("user", new User());
+        model.addAttribute("currentUser", currentUser);
         model.addAttribute("allRoles", roleService.findAllRoles());
         model.addAttribute("activeTab", activeTab != null ? activeTab : "nav-home-tab");
         return "users/index";
@@ -50,12 +53,12 @@ public class AdminController {
     }
 
     @PostMapping("/new")
-    public String createUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult, @RequestParam List<String> roles) {
+    public String createUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult, @RequestParam List<String> roleSelect) {
         if (bindingResult.hasErrors()) {
-            return "redirect:/admin/index?activeTab=nav-profile-tab";
+            return "redirect:/admin/index";
         }
-        userService.createUserWithRoles(user, roles);
-        return "redirect:/admin/index?activeTab=nav-home-tab";
+        userService.createUserWithRoles(user, roleSelect);
+        return "redirect:/admin/index";
     }
 
     @GetMapping("/{id}/edit")
@@ -80,8 +83,4 @@ public class AdminController {
         return "redirect:/admin/index";
     }
 
-    @GetMapping()
-    public String adminHome() {
-        return "users/adminPage";
-    }
 }
