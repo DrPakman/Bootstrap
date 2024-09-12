@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -49,20 +48,20 @@ public class UserService {
 
     @Transactional
     public void updateUserWithRoles(int id, User updateUser, List<String> roleNames) {
-        User user = entityManager.find(User.class, id);
-        if (user != null) {
-            user.setUsername(updateUser.getUsername());
-            user.setLastname(updateUser.getLastname());
-            user.setAge(updateUser.getAge());
-            user.setEmail(updateUser.getEmail());
-            user.setPassword(updateUser.getPassword());
+        User userToBeUpdate = entityManager.find(User.class, id);
+        if (userToBeUpdate != null) {
+            userToBeUpdate.setUsername(updateUser.getUsername());
+            userToBeUpdate.setLastname(updateUser.getLastname());
+            userToBeUpdate.setAge(updateUser.getAge());
+            userToBeUpdate.setEmail(updateUser.getEmail());
+            userToBeUpdate.setPassword(updateUser.getPassword());
 
             Set<Role> roles = roleNames.stream()
                     .map(roleService::findRoleByName)
                     .collect(Collectors.toSet());
-            user.setRoles(roles);
+            userToBeUpdate.setRoles(roles);
 
-            entityManager.merge(user);
+            entityManager.merge(userToBeUpdate);
         }
     }
 
