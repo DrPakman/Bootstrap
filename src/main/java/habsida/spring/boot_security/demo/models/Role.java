@@ -12,10 +12,10 @@ public class Role implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="role_id")
+    @Column(name = "role_id")
     private int roleId;
 
-    @Column(name="role_name")
+    @Column(name = "role_name")
     private String roleName;
 
     public Role() {
@@ -45,22 +45,5 @@ public class Role implements GrantedAuthority {
     @Override
     public String getAuthority() {
         return roleName;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Role role = (Role) o;
-        return Objects.equals(roleName, role.roleName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(roleName);
-    }
-    @Override
-    public String toString() {
-        return roleName.replaceFirst("ROLE_", "");
     }
 }

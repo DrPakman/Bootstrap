@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -53,8 +54,8 @@ public class AdminController {
     }
 
     @PostMapping("/new")
-    public String createUser(@ModelAttribute("user") @Valid User user, @RequestParam List<String> roleSelect) {
-        userService.createUserWithRoles(user, roleSelect);
+    public String SaveUser (@RequestParam("email") String email, @RequestParam("roles") List<String> roleNames) {
+        userService.saveUser(email, roleNames);
         return "redirect:/admin/index2";
     }
 
@@ -65,11 +66,11 @@ public class AdminController {
         return "users/editUser";
     }
 
-    @PatchMapping("/{id}")
-    public String update(@ModelAttribute("user") User user, @PathVariable("id") int id, @RequestParam List<String> roles) {
-        userService.updateUserWithRoles(id, user, roles);
-        return "redirect:/admin/index2";
-    }
+//    @PatchMapping("/{id}")
+//    public String update(@ModelAttribute("user") User user, @PathVariable("id") int id, @RequestParam List<String> roles) {
+//        userService.updateUserWithRoles(id, user, roles);
+//        return "redirect:/admin/index2";
+//    }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id) {

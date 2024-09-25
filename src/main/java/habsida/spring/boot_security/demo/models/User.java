@@ -1,6 +1,7 @@
 package habsida.spring.boot_security.demo.models;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
@@ -9,7 +10,9 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name="users")
@@ -46,13 +49,14 @@ public class User implements UserDetails {
             joinColumns = @JoinColumn(name="user_id"),
             inverseJoinColumns = @JoinColumn(name="role_id")
     )
-    private Collection<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     public User() {
 
     }
 
-    public User(String username, String lastname, int age, String email, String password, Collection<Role> roles) {
+    public User(int id, String username, String lastname, int age, String email, String password, Set<Role> roles) {
+        this.id = id;
         this.username = username;
         this.lastname = lastname;
         this.age = age;
@@ -60,7 +64,6 @@ public class User implements UserDetails {
         this.password = password;
         this.roles = roles;
     }
-
 
     public int getId() {
         return id;
@@ -111,17 +114,21 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public Collection<Role> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(Collection<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        for (Role role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
+        }
+        return authorities;
     }
 
     @Override
@@ -144,29 +151,4 @@ public class User implements UserDetails {
         return true;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return id == user.id &&
-                age == user.age &&
-                username.equals(user.username) &&
-                email.equals(user.email);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, username, age, email);
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "id=" + id +
-                ", username'" + username + '\'' +
-                ", password= '" + password + '\'' +
-                ", role='" + roles + '\'' +
-                '}';
-    }
 }

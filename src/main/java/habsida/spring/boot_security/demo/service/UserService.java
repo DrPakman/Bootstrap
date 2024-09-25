@@ -2,6 +2,7 @@ package habsida.spring.boot_security.demo.service;
 
 import habsida.spring.boot_security.demo.models.Role;
 import habsida.spring.boot_security.demo.models.User;
+import habsida.spring.boot_security.demo.repositories.RoleRepository;
 import habsida.spring.boot_security.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -9,22 +10,23 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Repository
 public class UserService {
 
     @PersistenceContext
     private EntityManager entityManager;
-    private final RoleService roleService;
-    private final UserRepository userRepository;
-
     @Autowired
-    public UserService(RoleService roleService, UserRepository userRepository) {
-        this.roleService = roleService;
+    private final UserRepository userRepository;
+    @Autowired
+    private final RoleRepository roleRepository;
+
+    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
     }
 
     @Transactional(readOnly = true)
@@ -37,32 +39,26 @@ public class UserService {
         return entityManager.find(User.class, id);
     }
 
-    @Transactional
-    public void createUserWithRoles(User user, List<String> roleNames) {
-        Set<Role> roles = roleNames.stream()
-                .map(roleService::findRoleByName)
-                .collect(Collectors.toSet());
-        user.setRoles(roles);
-        entityManager.persist(user);
-    }
+    public User saveUser(String username, String lastname, int age, String email, String password) {
+        User user = new User();
+        user.setEmail(email);
+        user.setUsername(username);
+        user.setLastname(lastname);
+        user.setAge(age);
+        user.setPassword(password);
 
-    @Transactional
-    public void updateUserWithRoles(int id, User updateUser, List<String> roleNames) {
-        User userToBeUpdate = entityManager.find(User.class, id);
-        if (userToBeUpdate != null) {
-            userToBeUpdate.setUsername(updateUser.getUsername());
-            userToBeUpdate.setLastname(updateUser.getLastname());
-            userToBeUpdate.setAge(updateUser.getAge());
-            userToBeUpdate.setEmail(updateUser.getEmail());
-            userToBeUpdate.setPassword(updateUser.getPassword());
 
-            Set<Role> roles = roleNames.stream()
-                    .map(roleService::findRoleByName)
-                    .collect(Collectors.toSet());
-            userToBeUpdate.setRoles(roles);
-
-            entityManager.merge(userToBeUpdate);
+        // Ищем роли по имени и добавляем их пользователю
+        Set<Role> roles = new HashSet<>();
+        for (String roleName : roleNames) {
+            Role role = roleRepository.findByRoleName(roleName)
+                    .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
+            roles.add(role);
         }
+        user.setRoles(roles);
+
+        // Сохраняем пользователя
+        return userRepository.save(user);
     }
 
     @Transactional
