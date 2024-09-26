@@ -12,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
@@ -53,13 +52,9 @@ public class AdminController {
     }
 
     @PostMapping("/new")
-    public String SaveUser(@ModelAttribute("user") User user, @RequestParam("roles") List<String> roleNames) {
-        List<Role> roles = roleService.findRoleByNames(roleNames);
-
-        // Отладочное сообщение для проверки содержимого roles
-        System.out.println("Found roles: " + roles);
-
-        user.setRoles(new HashSet<>(roles)); // Если у вас Collection<Role>, то используйте HashSet
+    public String SaveUser(@ModelAttribute("user") User user, @RequestParam("roles") String[] roleNames) {
+        List<Role> roles = roleService.findRoleByNames(Arrays.asList(roleNames));
+        user.setRoles(new ArrayList<>(roles));
         userService.createUser(user);
         return "redirect:/admin";
     }

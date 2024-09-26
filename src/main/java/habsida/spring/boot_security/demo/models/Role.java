@@ -1,8 +1,8 @@
 package habsida.spring.boot_security.demo.models;
 
+import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 
-import javax.persistence.*;
 import java.util.Collection;
 
 @Entity
@@ -16,7 +16,7 @@ public class Role implements GrantedAuthority {
 
     @Column(name = "role_name")
     private String name;
-
+//
     @ManyToMany(mappedBy = "roles")
     private Collection<User> users;
 
