@@ -1,19 +1,18 @@
 package habsida.spring.boot_security.demo.controllers;
 
+import habsida.spring.boot_security.demo.models.Role;
 import habsida.spring.boot_security.demo.service.RoleService;
-import habsida.spring.boot_security.demo.service.UserService;
 import habsida.spring.boot_security.demo.models.User;
+import habsida.spring.boot_security.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
@@ -30,7 +29,7 @@ public class AdminController {
 
     @GetMapping("")
     public String index(Model model, @AuthenticationPrincipal UserDetails currentUser) {
-        List<User> users = userService.index();
+        List<User> users = userService.Index();
         model.addAttribute("users", users);
         model.addAttribute("user", new User());
         model.addAttribute("currentUser", currentUser);
@@ -41,7 +40,7 @@ public class AdminController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model) {
-        User user = userService.show(id);
+        User user = userService.getUserByUsername(id);
         model.addAttribute("user", user);
         return "users/show";
     }
@@ -54,28 +53,34 @@ public class AdminController {
     }
 
     @PostMapping("/new")
-    public String SaveUser (@RequestParam("email") String email, @RequestParam("roles") List<String> roleNames) {
-        userService.saveUser(email, roleNames);
-        return "redirect:/admin/index2";
+    public String SaveUser(@ModelAttribute("user") User user, @RequestParam("roles") List<String> roleNames) {
+        List<Role> roles = roleService.findRoleByNames(roleNames);
+
+        // Отладочное сообщение для проверки содержимого roles
+        System.out.println("Found roles: " + roles);
+
+        user.setRoles(new HashSet<>(roles)); // Если у вас Collection<Role>, то используйте HashSet
+        userService.createUser(user);
+        return "redirect:/admin";
     }
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) {
-        model.addAttribute("user", userService.show(id));
+        model.addAttribute("user", userService.getUserByUsername(id));
         model.addAttribute("allRoles", roleService.findAllRoles());
         return "users/editUser";
     }
 
-//    @PatchMapping("/{id}")
-//    public String update(@ModelAttribute("user") User user, @PathVariable("id") int id, @RequestParam List<String> roles) {
-//        userService.updateUserWithRoles(id, user, roles);
-//        return "redirect:/admin/index2";
-//    }
+    @PatchMapping("/{id}")
+    public String update(@ModelAttribute("user") User user, @PathVariable("id") int id, @RequestParam List<String> roles) {
+        userService.updateUser(user);
+        return "redirect:/admin";
+    }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id) {
-        userService.delete(id);
-        return "redirect:/admin/index2";
+        userService.deleteUser(id);
+        return "redirect:/admin";
     }
 
 }

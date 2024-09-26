@@ -10,9 +10,9 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name="users")
@@ -20,7 +20,7 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="user_id")
-    private int id;
+    private Long id;
 
     @NotEmpty(message = "Name should not be empty")
     @Size(min=2, max = 30, message = "Name should be between 2 and 30 characters")
@@ -49,13 +49,13 @@ public class User implements UserDetails {
             joinColumns = @JoinColumn(name="user_id"),
             inverseJoinColumns = @JoinColumn(name="role_id")
     )
-    private Set<Role> roles = new HashSet<>();
+    private Collection<Role> roles;
 
     public User() {
 
     }
 
-    public User(int id, String username, String lastname, int age, String email, String password, Set<Role> roles) {
+    public User(Long id, String username, String lastname, int age, String email, String password, Set<Role> roles) {
         this.id = id;
         this.username = username;
         this.lastname = lastname;
@@ -65,11 +65,11 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -114,21 +114,19 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public Set<Role> getRoles() {
+    public Collection<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<Role> roles) {
+    public void setRoles(Collection<Role> roles) {
         this.roles = roles;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<GrantedAuthority> authorities = new HashSet<>();
-        for (Role role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
-        }
-        return authorities;
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toList());
     }
 
     @Override

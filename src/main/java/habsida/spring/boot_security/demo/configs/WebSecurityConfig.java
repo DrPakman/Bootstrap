@@ -19,7 +19,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final SuccessUserHandler successUserHandler;
     private final UserDetailsServiceImpl userDetailsServiceImpl;
 
-
     @Autowired
     @Lazy
     public WebSecurityConfig(SuccessUserHandler successUserHandler, UserDetailsService userDetailsService, UserDetailsServiceImpl userDetailsService1, UserDetailsServiceImpl userDetailsServiceImpl) {
@@ -56,5 +55,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return NoOpPasswordEncoder.getInstance();
     }
-
 }
