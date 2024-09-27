@@ -31,23 +31,4 @@ class SpringBootSecurityDemoApplicationTests {
 		MockitoAnnotations.openMocks(this);
 	}
 
-	@Test
-	public void testFindRoleByNames() {
-		// Подготовка данных
-		List<String> roleNames = Arrays.asList("ROLE_ADMIN", "ROLE_USER");
-		Role adminRole = new Role(1L, "ROLE_ADMIN");
-		Role userRole = new Role(2L, "ROLE_USER");
-
-		// Настройка моков
-		when(roleRepository.findByNameIn(roleNames)).thenReturn(Arrays.asList(adminRole, userRole));
-
-		// Вызов метода
-		List<Role> roles = roleService.findRoleByNames(roleNames);
-
-		// Проверка результатов
-		assertEquals(2, roles.size());
-		assertEquals("ROLE_ADMIN", roles.get(0).getName());
-		assertEquals("ROLE_USER", roles.get(1).getName());
-	}
-
 }

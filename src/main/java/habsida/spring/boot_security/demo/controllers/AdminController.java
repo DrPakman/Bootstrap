@@ -52,30 +52,34 @@ public class AdminController {
     }
 
     @PostMapping("/new")
-    public String SaveUser(@ModelAttribute("user") User user, @RequestParam("roles") String[] roleNames) {
-        List<Role> roles = roleService.findRoleByNames(Arrays.asList(roleNames));
-        user.setRoles(new ArrayList<>(roles));
-        userService.createUser(user);
-        return "redirect:/admin";
+    public String createUser(@ModelAttribute User user, @RequestParam List<String> roleNames) {
+        for (String roleName : roleNames) {
+            Role role = roleService.findRoleByNames(roleName); // Находим роль по имени
+            if (role != null) {
+                user.addRole(role); // Назначаем роль пользователю
+            }
+        }
+        userService.createUser(user); // Создаем пользователя
+        return "redirect:/admin"; // Перенаправление на страницу администрирования
     }
 
-    @GetMapping("/{id}/edit")
-    public String edit(Model model, @PathVariable("id") int id) {
-        model.addAttribute("user", userService.getUserByUsername(id));
-        model.addAttribute("allRoles", roleService.findAllRoles());
-        return "users/editUser";
-    }
+//    @GetMapping("/{id}/edit")
+//    public String edit(Model model, @PathVariable("id") int id) {
+//        model.addAttribute("user", userService.getUserByUsername(id));
+//        model.addAttribute("allRoles", roleService.findAllRoles());
+//        return "users/editUser";
+//    }
+//
+//    @PatchMapping("/{id}")
+//    public String update(@ModelAttribute("user") User user, @PathVariable("id") int id, @RequestParam List<String> roles) {
+//        userService.updateUser(user);
+//        return "redirect:/admin";
+//    }
 
-    @PatchMapping("/{id}")
-    public String update(@ModelAttribute("user") User user, @PathVariable("id") int id, @RequestParam List<String> roles) {
-        userService.updateUser(user);
-        return "redirect:/admin";
-    }
-
-    @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") int id) {
-        userService.deleteUser(id);
-        return "redirect:/admin";
-    }
+//    @DeleteMapping("/{id}")
+//    public String delete(@PathVariable("id") int id) {
+//        userService.deleteUser(id);
+//        return "redirect:/admin";
+//    }
 
 }

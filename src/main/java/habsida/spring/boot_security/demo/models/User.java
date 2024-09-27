@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,7 +47,7 @@ public class User implements UserDetails {
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Collection<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     public User() {
 
@@ -111,12 +112,16 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public Collection<Role> getRoles() {
-        return roles;
+    public void addRole(Role role) {
+        this.roles.add(role); // Добавляем роль к пользователю
     }
 
-    public void setRoles(Collection<Role> roles) {
-        this.roles = roles;
+    public void removeRole(Role role) {
+        this.roles.remove(role); // Удаляем роль у пользователя
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
     }
 
     @Override

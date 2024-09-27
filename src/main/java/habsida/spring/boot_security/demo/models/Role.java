@@ -15,17 +15,18 @@ public class Role implements GrantedAuthority {
     private Long id;
 
     @Column(name = "role_name")
-    private String name;
-//
+    private String roleName;
+
     @ManyToMany(mappedBy = "roles")
     private Collection<User> users;
 
     public Role() {
     }
 
-    public Role(Long id, String name) {
+    public Role(Long id, String roleName, Collection<User> users) {
         this.id = id;
-        this.name = name;
+        this.roleName = roleName;
+        this.users = users;
     }
 
     public Long getId() {
@@ -37,20 +38,20 @@ public class Role implements GrantedAuthority {
     }
 
     public String getName() {
-        return name;
+        return roleName;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.roleName = name;
     }
 
     @Override
     public String getAuthority() {
-        return name;
+        return roleName;
     }
     @Override
     public String toString() {
-        return this.name.replace("ROLE_", "");  // Вернёт роль без префикса ROLE_
+        return this.roleName.replace("ROLE_", "");  // Вернёт роль без префикса ROLE_
     }
 
     public Collection<User> getUsers() {
