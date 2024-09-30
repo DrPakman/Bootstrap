@@ -8,12 +8,14 @@
 </head>
 <body>
 <nav class="navbar text-bg-dark" style="padding:15px;">
-    <div>
-    <span style="margin-right: 10px" sec:authentication="principal.email"></span>
+    <div th:object="${user}">
+    <span style="margin-right: 10px" th:text="${user.email}"></span>
     <span style="margin-right: 10px">with roles</span>
-    <span sec:authentication="principal.authorities"></span>
+    <span th:text="${user.roles}"></span>
     </div>
-        <a class="nav-link text-secondary" href="/logout">Logout</a>
+    <form action="/logout" method="post">
+        <button type="submit" class="nav-link text-secondary">Logout</button>
+    </form>
 </nav>
 <div class="row">
     <div class="col mt-3 p-0">

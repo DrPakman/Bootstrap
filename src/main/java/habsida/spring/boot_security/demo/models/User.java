@@ -9,9 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
@@ -47,13 +45,12 @@ public class User implements UserDetails {
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
-
+    private List<Role> roles = new ArrayList<>();
     public User() {
 
     }
 
-    public User(Long id, String username, String lastname, int age, String email, String password, Set<Role> roles) {
+    public User(Long id, String username, String lastname, int age, String email, String password, List<Role> roles) {
         this.id = id;
         this.username = username;
         this.lastname = lastname;
@@ -120,7 +117,7 @@ public class User implements UserDetails {
         this.roles.remove(role); // Удаляем роль у пользователя
     }
 
-    public Set<Role> getRoles() {
+    public List<Role> getRoles() {
         return roles;
     }
 

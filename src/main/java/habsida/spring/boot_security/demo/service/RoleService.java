@@ -13,12 +13,12 @@ public class RoleService {
     public RoleService(RoleRepository roleRepository) {
         this.roleRepository = roleRepository;
     }
+//
+//    public List<Role> findAllRoles() {
+//        return roleRepository.findAll();
+//    }
 
-    public List<Role> findAllRoles() {
-        return roleRepository.findAll();
-    }
-
-    public List<Role> findRoleByNames(List<String> roleNames) {
+    public List<Role> findRolesByNames(List<String> roleNames) {
         return roleRepository.findByRoleNameIn(roleNames);
     }
 }

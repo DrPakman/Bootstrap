@@ -32,54 +32,51 @@ public class AdminController {
         model.addAttribute("users", users);
         model.addAttribute("user", new User());
         model.addAttribute("currentUser", currentUser);
-        model.addAttribute("allRoles", roleService.findAllRoles());
-//        model.addAttribute("activeTab", activeTab != null ? activeTab : "nav-home-tab");
-        return "users/index2";
-    }
-
-    @GetMapping("/{id}")
-    public String show(@PathVariable("id") int id, Model model) {
-        User user = userService.getUserByUsername(id);
-        model.addAttribute("user", user);
-        return "users/show";
+        return "users/index";
     }
 
     @GetMapping("/new")
     public String newUser(Model model) {
         model.addAttribute("user", new User());
-        model.addAttribute("allRoles", roleService.findAllRoles());
-        return "users/index2";
+        return "users/index";
     }
 
     @PostMapping("/new")
     public String createUser(@ModelAttribute User user, @RequestParam List<String> roleNames) {
-        for (String roleName : roleNames) {
-            Role role = roleService.findRoleByNames(roleName); // Находим роль по имени
-            if (role != null) {
-                user.addRole(role); // Назначаем роль пользователю
-            }
+        List<Role> roles = roleService.findRolesByNames(roleNames);
+        for (Role role : roles) {
+            user.addRole(role);
         }
-        userService.createUser(user); // Создаем пользователя
-        return "redirect:/admin"; // Перенаправление на страницу администрирования
+        userService.createUser(user);
+        return "redirect:/admin";
     }
 
-//    @GetMapping("/{id}/edit")
-//    public String edit(Model model, @PathVariable("id") int id) {
-//        model.addAttribute("user", userService.getUserByUsername(id));
-//        model.addAttribute("allRoles", roleService.findAllRoles());
-//        return "users/editUser";
-//    }
-//
-//    @PatchMapping("/{id}")
-//    public String update(@ModelAttribute("user") User user, @PathVariable("id") int id, @RequestParam List<String> roles) {
-//        userService.updateUser(user);
-//        return "redirect:/admin";
-//    }
+@PatchMapping("/{id}/edit")
+public String update(@ModelAttribute User user, @PathVariable int id, @RequestParam List<String> roleNames) {
+    User existingUser = userService.getUserByUsername(id);
 
-//    @DeleteMapping("/{id}")
-//    public String delete(@PathVariable("id") int id) {
-//        userService.deleteUser(id);
-//        return "redirect:/admin";
-//    }
+    existingUser.setUsername(user.getUsername());
+    existingUser.setLastname(user.getLastname());
+    existingUser.setAge(user.getAge());
+    existingUser.setEmail(user.getEmail());
+    existingUser.setPassword(user.getPassword());
+
+    List<Role> roles = roleService.findRolesByNames(roleNames);
+    existingUser.getRoles().clear();
+    for (Role role : roles) {
+        existingUser.addRole(role);
+    }
+
+    // Сохраняем обновленного пользователя
+    userService.updateUser(existingUser);
+    return "redirect:/admin"; // Перенаправление на страницу администрирования
+}
+
+
+    @DeleteMapping("/{id}/delete")
+    public String delete(@PathVariable("id") int id) {
+        userService.deleteUser(id);
+        return "redirect:/admin";
+    }
 
 }

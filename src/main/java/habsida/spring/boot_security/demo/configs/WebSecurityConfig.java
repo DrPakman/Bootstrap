@@ -38,6 +38,9 @@ public class WebSecurityConfig {
                     .successHandler(successUserHandler)
                     .failureUrl("/auth/login?error")
             )
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/logout") // Отключить CSRF для логаута
+                )
                 .logout(logout-> logout
                     .logoutUrl("/logout")
                     .logoutSuccessUrl("/auth/login?logout")
